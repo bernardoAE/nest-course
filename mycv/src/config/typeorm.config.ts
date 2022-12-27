@@ -7,11 +7,34 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
   constructor(private configService: ConfigService) {}
 
   createTypeOrmOptions(): TypeOrmModuleOptions {
-    return {
-      type: 'sqlite',
+    const dbConfig = {
       synchronize: false,
-      database: this.configService.get<string>('DB_NAME'),
-      autoLoadEntities: true,
+      migrations: ['migrations/*.js'],
+      cli: {
+        migrationsDir: 'migrations',
+      },
     };
+
+    switch (process.env.NODE_ENV) {
+      case 'development':
+        Object.assign(dbConfig, {
+          type: 'sqlite',
+          database: 'db.sqlite',
+          entities: ['**/*.entity.js'],
+        });
+        break;
+      case 'test':
+        Object.assign(dbConfig, {
+          type: 'sqlite',
+          database: 'test.sqlite',
+          entities: ['**/*.entity.ts'],
+        });
+        break;
+      case 'production':
+        break;
+      default:
+        throw new Error('unknown environment');
+    }
+    return dbConfig;
   }
 }
