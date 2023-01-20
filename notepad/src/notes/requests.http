@@ -1,0 +1,8 @@
+### Create a note
+POST http://localhost:3000/notes
+Content-Type: application/json
+
+{
+  "title": "ford",
+  "body": "mustang"
+}
